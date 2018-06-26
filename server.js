@@ -13,7 +13,14 @@ const app = express();
 app.use(express.static('public'));
 
 app.get('/api/notes', (req, res) => {
-  res.json(data);
+  let filteredData = data;
+  const searchTerm = req.query.searchTerm;
+  
+  if (searchTerm) {
+    filteredData = data.filter(note => note.title.includes(searchTerm));
+  }
+
+  res.json(filteredData);
 });
 
 app.get('/api/notes/:id', (req, res) => {
