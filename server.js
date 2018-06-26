@@ -9,9 +9,11 @@ console.log('Hello Noteful!');
 const express = require('express');
 const app = express();
 const { PORT } = require('./config');
+const { logger } = require('./middleware/logger');
 
 // ADD STATIC SERVER HERE
 app.use(express.static('public'));
+app.use(logger);
 
 app.get('/api/notes', (req, res) => {
   let filteredData = data;
