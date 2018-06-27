@@ -41,7 +41,6 @@ notes.update(1005, updateObj, (err, item) => {
   }
 });
 
-<<<<<<< HEAD
 // POST to create a new note
 const newItem = {
   title: 'Title of New Item',
@@ -50,21 +49,10 @@ const newItem = {
 notes.create(newItem, (err, item) => {
   if (err) {
     console.error(err);
-=======
-// POST (Create) New Note
-const newItem = {
-  title: 'New Item Title',
-  content: 'zipadeedoodah'
-};
-notes.create(newItem, (err, item) => {
-  if (err) {
-    console.error(err)
->>>>>>> feature/middleware-modules
   }
   if (item) {
     console.log(item);
   } else {
-<<<<<<< HEAD
     console.log('not created');
   }
 });
@@ -81,20 +69,3 @@ notes.delete(noteID, (err, len) => {
     console.log('unable to delete');
   }
 });
-=======
-    console.log('not found');
-  }
-});
-
-// DELETE A New note
-notes.delete(1010, (err, length) => {
-  if (err) {
-    console.error(err);
-  }
-  if (length) {
-    console.log(length);
-  } else {
-    console.log('length not found');
-  }
-});
->>>>>>> feature/middleware-modules

@@ -84,9 +84,9 @@ router.delete('/notes/:id', (req, res, next) => {
 
   notes.delete(id, err => {
     if (err) {
-      res.status(500).json(err.message);
+      return next(err);
     }
-    res.status(204).end();
+    res.sendStatus(204);
   });
 });
 
