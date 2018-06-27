@@ -11,11 +11,11 @@ console.log('Hello Noteful!');
 const express = require('express');
 const app = express();
 const { PORT } = require('./config');
-const { logger } = require('./middleware/logger');
+const morgan = require('morgan');
 
 // ADD STATIC SERVER HERE
+app.use(morgan('dev'));
 app.use(express.static('public'));
-app.use(logger);
 
 // PARSE REQUEST BODY
 app.use(express.json());
