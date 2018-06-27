@@ -2,6 +2,8 @@
 
 // Load array of notes
 const data = require('./db/notes');
+const simDB = require('./db/simDB');
+const notes = simDB.initialize(data);
 
 console.log('Hello Noteful!');
 
@@ -12,23 +14,26 @@ const app = express();
 // ADD STATIC SERVER HERE
 app.use(express.static('public'));
 
-app.get('/api/notes', (req, res) => {
-  let filteredData = data;
-  const searchTerm = req.query.searchTerm;
-  
-  if (searchTerm) {
-    filteredData = data.filter(note => note.title.includes(searchTerm));
-  }
+app.get('/api/notes', (req, res, next) => {
+  const { searchTerm } = req.query;
 
-  res.json(filteredData);
+  notes.filter(searchTerm, (err, list) => {
+    if (err) {
+      return next(err);
+    }
+    res.json(list);
+  });
 });
 
-app.get('/api/notes/:id', (req, res) => {
-  const id = req.params.id;
-  const note = data.find(item => item.id === Number(id));
-  res.json(note);
+app.get('/api/notes/:id', (req, res, next) => {
+  const { id } = req.params;
+  notes.find(id, (err, item) => {
+    if (err) {
+      return next(err);
+    }
+    res.json(item);
+  });
 });
-
 
 app.listen(8080, function() {
   console.info(`Server listening on ${this.address().port}`);
