@@ -5,10 +5,11 @@ console.log('Hello Noteful!');
 
 // IMPORT MODULES
 const express = require('express');
-const app = express();
 const { PORT } = require('./config');
 const morgan = require('morgan');
 const notesRouter = require('./router/notes.router');
+
+const app = express();
 
 // LOGGING
 app.use(morgan('dev'));

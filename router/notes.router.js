@@ -2,11 +2,11 @@
 
 // IMPORT MODULES
 const express = require('express');
-const router = express.Router();
-
-// LOAD ARRAY OF NOTES
 const data = require('../db/notes');
 const simDB = require('../db/simDB');
+
+// INITIALIZATION
+const router = express.Router();
 const notes = simDB.initialize(data);
 
 // ENDPOINTS
