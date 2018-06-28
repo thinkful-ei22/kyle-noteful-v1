@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+
+  <script type="text/javascript" src="//code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+    crossorigin="anonymous"></script>
+  <script type="text/javascript" src="./scripts/api.js"></script>
+  <script type="text/javascript">
+    // test get all
+    api.search({})
+      .then(response => {
+        console.log('testing GET all:', response);
+      });
+
+    // test get all with search term
+    api.search({searchTerm: 'cats'})
+      .then(response => {
+        console.log('testing GET all with searchTerm "cats":', response);
+      });
+
+    // test get details with id
+    api.details(1004)
+      .then(response => {
+        console.log('testing GET note details:', response);
+      });
+
+    // test update note
+    const updateObj = {
+      id: '1004',
+      title: 'This title about cats has been updated',
+      content: 'We used a promise to update it.'
+    };
+    api.update(1004, updateObj)
+      .then(response => {
+        console.log('testing note update:', response);
+      });
+    
+    // test create note
+    const newNote = {
+      title: '5 reasons why my cat will eat your cat',
+      content: 'because, reasons...'
+    };
+    api.create(newNote)
+      .then(response => {
+        console.log('testing note creation:', response);
+      });
+    
+    // test delete note
+    api.remove(1010)
+      .then(response => {
+        console.log('deletion test returns undefined:', response);
+      })
+      .then(() => {
+        console.log('expect a 404 error below from this method');
+        return api.details(1010);
+      });
+    
+  </script>
+</body>
+</html>
