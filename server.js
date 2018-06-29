@@ -5,11 +5,14 @@ console.log('Hello Noteful!');
 
 // IMPORT MODULES
 const express = require('express');
-const { PORT } = require('./config');
+const PORT = require('./config');
 const morgan = require('morgan');
 const notesRouter = require('./router/notes.router');
 
 const app = express();
+
+// PORT HANDLE DEV VS PROD
+const envPort = process.env.PORT || PORT;
 
 // LOGGING
 app.use(morgan('dev'));
@@ -41,7 +44,7 @@ app.use(function (err, req, res, next) {
 
 // LISTENER
 if (require.main === module) {
-  app.listen(PORT, function() {
+  app.listen(envPort, function() {
     // eslint-disable-next-line no-console
     console.info(`Server listening on ${this.address().port}`);
   }).on('error', err => {
