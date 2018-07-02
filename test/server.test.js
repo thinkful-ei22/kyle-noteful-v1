@@ -26,7 +26,6 @@ describe('Express static', function() {
     return chai.request(app)
       .get('/')
       .then(function(res) {
-        expect(res).to.exist;
         expect(res).to.have.status(200);
         expect(res).to.be.html;
       });
@@ -53,21 +52,23 @@ describe('GET /api/notes', function() {
       .get('/api/notes')
       .then(function(res) {
         expect(res).to.have.status(200);
+        expect(res).to.be.json;
         expect(res.body).to.be.an('array');
         expect(res.body).to.have.length(10);
       });
   });
 
   it('should return an array of objects with the `id`, `title`, and `content` keys', function() {
+    const expectedKeys = ['id', 'title', 'content'];
+    
     return chai.request(app)
       .get('/api/notes')
       .then(function(res) {
-        const resBody = res.body;
-        const expectedKeys = ['id', 'title', 'content'];
-        
-        expect(resBody).to.be.an('array');
+        expect(res).to.have.status(200);
+        expect(res).to.be.json;
+        expect(res.body).to.be.an('array');
 
-        resBody.forEach(function(item) {
+        res.body.forEach(function(item) {
           expect(item).to.be.an('object');
           expect(item).to.have.keys(expectedKeys);
         });
@@ -81,6 +82,7 @@ describe('GET /api/notes', function() {
       .get(`/api/notes${validQuery}`)
       .then(function(res) {
         expect(res).to.have.status(200);
+        expect(res).to.be.json;
         expect(res.body).to.be.an('array');
         expect(res.body).to.have.length(1);
       });
@@ -93,6 +95,7 @@ describe('GET /api/notes', function() {
       .get(`/api/notes${invalidQuery}`)
       .then(function(res) {
         expect(res).to.have.status(200);
+        expect(res).to.be.json;
         expect(res.body).to.be.an('array');
         expect(res.body).to.have.length(0);
       });
@@ -113,6 +116,8 @@ describe('GET /api/notes/:id', function() {
     return chai.request(app)
       .get(`/api/notes/${testNote.id}`)
       .then(function(res) {
+        expect(res).to.have.status(200);
+        expect(res).to.be.json;
         expect(res.body).to.be.an('object');
         expect(res.body).to.have.keys(expectedKeys);
         expect(res.body).to.deep.equal(testNote);
@@ -144,22 +149,24 @@ describe('POST /api/notes', function() {
       .send(validData)
       .then(function(res) {
         expect(res).to.have.status(201);
+        expect(res).to.be.json;
         expect(res.body).to.be.an('object');
         expect(res.headers.location).to.exist;
       });
   });
 
   it('should return an object with a message property "Missing `title` in request body" when missing "title" field', function() {
-    const missingTitle = {
+    const titleMissing = {
       content: 'I have deliberately sent an object without a `title` field'
     };
-    const expectedErrorMessage = 'missing `title` in request body';
+    const expectedErrorMessage = 'Missing `title` in request body';
 
     return chai.request(app)
       .post('/api/notes')
-      .send(missingTitle)
+      .send(titleMissing)
       .then(function(res) {
         expect(res).to.have.status(400);
+        expect(res).to.be.json;
         expect(res.body).to.be.an('object');
         expect(res.body).to.include.key('message');
         expect(res.body.message).to.equal(expectedErrorMessage);
@@ -170,16 +177,87 @@ describe('POST /api/notes', function() {
 
 describe('PUT /api/notes/:id', function() {
 
-  it('should update and return a note object when given valid data');
+  it('should update and return a note object when given valid data', function() {
+    const testNote = {
+      id: 1005,
+      title: '10 ways cats can help you live to 100',
+      content: 'Posuere sollicitudin aliquam ultrices sagittis orci a. Feugiat sed lectus vestibulum mattis ullamcorper velit. Odio pellentesque diam volutpat commodo sed egestas egestas fringilla. Velit egestas dui id ornare arcu odio. Molestie at elementum eu facilisis sed odio morbi. Tempor nec feugiat nisl pretium. At tempor commodo ullamcorper a lacus. Egestas dui id ornare arcu odio. Id cursus metus aliquam eleifend. Vitae sapien pellentesque habitant morbi tristique. Dis parturient montes nascetur ridiculus. Egestas egestas fringilla phasellus faucibus scelerisque eleifend. Aliquam faucibus purus in massa tempor nec feugiat nisl.'
+    };
+    const validData = {
+      title: '9 ways cats can help you live to 99',
+      content: 'Updated via PUT'
+    };
+    const expectedKeys = ['id', 'title', 'content'];
 
-  it('should respond with a 404 for an invalid id (`/api/notes/DOESNOTEXIST`)');
+    return chai.request(app)
+      .put(`/api/notes/${testNote.id}`)
+      .send(validData)
+      .then(function(res) {
+        expect(res).to.have.status(200);
+        expect(res).to.be.json;
+        expect(res.body).to.be.an('object');
+        expect(res.body).to.have.keys(expectedKeys);
+        expect(res.body.id).to.equal(testNote.id);
+        expect(res.body.title).to.equal(validData.title);
+        expect(res.body.content).to.equal(validData.content);
+      });
+  });
 
-  it('should return an object with a message property "Missing `title` in request body" when missing "title" field');
+  it('should respond with a 404 for an invalid id (`/api/notes/DOESNOTEXIST`)', function() {
+    const invalidId = 'DOESNOTEXIST';
+    const validData = {
+      title: '9 ways cats can help you live to 99',
+      content: 'Updated via PUT'
+    };
+
+    return chai.request(app)
+      .put(`/api/notes/${invalidId}`)
+      .send(validData)
+      .then(function(res) {
+        expect(res).to.have.status(404);
+      });
+  });
+
+  it('should return an object with a message property "Missing `title` in request body" when missing "title" field', function() {
+    const testNote = {
+      id: 1005,
+      title: '10 ways cats can help you live to 100',
+      content: 'Posuere sollicitudin aliquam ultrices sagittis orci a. Feugiat sed lectus vestibulum mattis ullamcorper velit. Odio pellentesque diam volutpat commodo sed egestas egestas fringilla. Velit egestas dui id ornare arcu odio. Molestie at elementum eu facilisis sed odio morbi. Tempor nec feugiat nisl pretium. At tempor commodo ullamcorper a lacus. Egestas dui id ornare arcu odio. Id cursus metus aliquam eleifend. Vitae sapien pellentesque habitant morbi tristique. Dis parturient montes nascetur ridiculus. Egestas egestas fringilla phasellus faucibus scelerisque eleifend. Aliquam faucibus purus in massa tempor nec feugiat nisl.'
+    };
+    const titleMissing = {
+      content: 'I have deliberately sent an object without a `title` field'
+    };
+    const expectedErrorMessage = 'Missing `title` in request body';
+
+    return chai.request(app)
+      .put(`/api/notes/${testNote.id}`)
+      .send(titleMissing)
+      .catch(function(err) { err.response; })
+      .then(function(res) {
+        expect(res).to.have.status(400);
+        expect(res).to.be.json;
+        expect(res.body).to.be.an('object');
+        expect(res.body.message).to.exist;
+        expect(res.body.message).to.equal(expectedErrorMessage);
+      });
+  });
 
 });
 
 describe('DELETE /api/notes/:id', function() {
 
-  it('should delete an item by id');
+  it('should delete an item by id', function() {
+    const testNote = {
+      id: 1005,
+      title: '10 ways cats can help you live to 100',
+      content: 'Posuere sollicitudin aliquam ultrices sagittis orci a. Feugiat sed lectus vestibulum mattis ullamcorper velit. Odio pellentesque diam volutpat commodo sed egestas egestas fringilla. Velit egestas dui id ornare arcu odio. Molestie at elementum eu facilisis sed odio morbi. Tempor nec feugiat nisl pretium. At tempor commodo ullamcorper a lacus. Egestas dui id ornare arcu odio. Id cursus metus aliquam eleifend. Vitae sapien pellentesque habitant morbi tristique. Dis parturient montes nascetur ridiculus. Egestas egestas fringilla phasellus faucibus scelerisque eleifend. Aliquam faucibus purus in massa tempor nec feugiat nisl.'
+    };
+
+    return chai.request(app)
+      .delete(`/api/notes/${testNote.id}`)
+      .then(function(res) {
+        expect(res).to.have.status(204);
+      });
+  });
 
 });
